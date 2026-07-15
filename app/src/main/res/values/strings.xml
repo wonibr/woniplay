@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Midia Indoor Player</string>
+    <string name="default_player_url">https://wonicard.com.br</string>
 </resources>
