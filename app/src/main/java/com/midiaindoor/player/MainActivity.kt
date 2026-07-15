@@ -67,10 +67,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         val urlSalva = prefs.getString(KEY_URL, null)
-        if (urlSalva.isNullOrBlank()) {
-            mostrarDialogoDeUrl()
-        } else {
+        if (!urlSalva.isNullOrBlank()) {
+            // Ja tem um link configurado (usuario trocou manualmente antes) -- usa ele
             carregar(urlSalva)
+        } else {
+            // Primeira vez abrindo: usa o link padrao de fabrica, sem perguntar nada
+            val urlPadrao = getString(R.string.default_player_url)
+            if (urlPadrao.isNotBlank()) {
+                prefs.edit().putString(KEY_URL, urlPadrao).apply()
+                carregar(urlPadrao)
+            } else {
+                mostrarDialogoDeUrl()
+            }
         }
     }
 
