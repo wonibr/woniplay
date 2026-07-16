@@ -2,6 +2,7 @@ package com.midiaindoor.player
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
