@@ -12,7 +12,7 @@ import java.net.URL
 // TROCAR pela URL real quando o backend estiver pronto.
 object ApiCliente {
 
-    private const val BASE_URL = "https://wonicard.com.br/api"
+    private const val BASE_URL = "https://woni.com.br/woniplay/api"
 
     data class TvInfo(val id: String, val nome: String)
 
