@@ -29,7 +29,7 @@ class SelecionarTvActivity : AppCompatActivity() {
 
         val root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
-        root.setBackgroundColor(Color.parseColor("#12261C"))
+        root.setBackgroundColor(Color.BLACK)
         root.setPadding(pad32, pad48, pad32, pad32)
 
         val titulo = TextView(this)
