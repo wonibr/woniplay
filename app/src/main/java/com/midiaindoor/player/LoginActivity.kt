@@ -40,11 +40,11 @@ class LoginActivity : AppCompatActivity() {
         val root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
         root.gravity = Gravity.CENTER
-        root.setBackgroundColor(Color.parseColor("#12261C"))
+        root.setBackgroundColor(Color.BLACK)
         root.setPadding(pad48, pad48, pad48, pad48)
 
         val titulo = TextView(this)
-        titulo.text = "Midia Indoor Player"
+        titulo.text = "Woniplay"
         titulo.setTextColor(Color.WHITE)
         titulo.textSize = 26f
         titulo.gravity = Gravity.CENTER
