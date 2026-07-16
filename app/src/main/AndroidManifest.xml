@@ -35,6 +35,13 @@
             -->
         </activity>
 
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SelecionarTvActivity"
+            android:exported="false" />
+
         <!-- Gatilho de auto-inicio: quando o aparelho liga, abre o player sozinho -->
         <receiver
             android:name=".BootReceiver"
