@@ -39,6 +39,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+        // Antes de tudo: precisa estar logado e ter escolhido uma TV.
+        val token = prefs.getString("token", null)
+        val tvId = prefs.getString("tv_id", null)
+        if (token.isNullOrBlank()) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+        if (tvId.isNullOrBlank()) {
+            startActivity(Intent(this, SelecionarTvActivity::class.java))
+            finish()
+            return
+        }
+
         aplicarTelaCheia()
 
         val root = FrameLayout(this)
