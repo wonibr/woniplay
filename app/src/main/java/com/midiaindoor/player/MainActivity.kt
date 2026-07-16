@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.View
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -16,12 +17,14 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var prefs: SharedPreferences
+    private lateinit var debugText: TextView
     private val handler = Handler(Looper.getMainLooper())
     private var reloadRunnable: Runnable? = null
 
@@ -38,13 +41,30 @@ class MainActivity : AppCompatActivity() {
 
         aplicarTelaCheia()
 
+        val root = FrameLayout(this)
+
         webView = WebView(this)
-
-        // Correcao para TV Boxes com GPU/driver problematico (ex.: Rockchip/Allwinner
-        // antigos): sem isso a WebView pode desenhar so uma tela branca vazia.
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        root.addView(
+            webView,
+            FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        )
 
-        setContentView(webView)
+        // Camada de diagnostico: mostra qual link esta tentando abrir, e se der
+        // erro, mostra o erro exato na tela (em vez de so ficar branco sem explicar nada).
+        debugText = TextView(this)
+        debugText.setBackgroundColor(Color.BLACK)
+        debugText.setTextColor(Color.WHITE)
+        debugText.textSize = 16f
+        val pad = (24 * resources.displayMetrics.density).toInt()
+        debugText.setPadding(pad, pad, pad, pad)
+        debugText.gravity = Gravity.TOP or Gravity.START
+        root.addView(
+            debugText,
+            FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        )
+
+        setContentView(root)
 
         val settings: WebSettings = webView.settings
         settings.javaScriptEnabled = true
@@ -55,12 +75,22 @@ class MainActivity : AppCompatActivity() {
         settings.cacheMode = WebSettings.LOAD_DEFAULT
 
         webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                debugText.visibility = View.GONE
+            }
+
             override fun onReceivedError(
                 view: WebView?,
                 request: WebResourceRequest?,
                 error: WebResourceError?
             ) {
                 super.onReceivedError(view, request, error)
+                val msg = "ERRO ao carregar:\n" + (request?.url?.toString() ?: "?") +
+                    "\n\ncodigo: " + (error?.errorCode ?: "?") +
+                    "\ndescricao: " + (error?.description ?: "?")
+                debugText.text = msg
+                debugText.visibility = View.VISIBLE
                 agendarNovaTentativa()
             }
         }
@@ -72,18 +102,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         val urlSalva = prefs.getString(KEY_URL, null)
-        if (!urlSalva.isNullOrBlank()) {
-            // Ja tem um link configurado (usuario trocou manualmente antes) -- usa ele
-            carregar(urlSalva)
+        val urlParaCarregar: String? = if (!urlSalva.isNullOrBlank()) {
+            urlSalva
         } else {
-            // Primeira vez abrindo: usa o link padrao de fabrica, sem perguntar nada
             val urlPadrao = getString(R.string.default_player_url)
             if (urlPadrao.isNotBlank()) {
                 prefs.edit().putString(KEY_URL, urlPadrao).apply()
-                carregar(urlPadrao)
+                urlPadrao
             } else {
-                mostrarDialogoDeUrl()
+                null
             }
+        }
+
+        if (urlParaCarregar != null) {
+            debugText.text = "Tentando abrir:\n" + urlParaCarregar
+            carregar(urlParaCarregar)
+        } else {
+            mostrarDialogoDeUrl()
         }
     }
 
