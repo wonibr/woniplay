@@ -39,6 +39,11 @@ class MainActivity : AppCompatActivity() {
         aplicarTelaCheia()
 
         webView = WebView(this)
+
+        // Correcao para TV Boxes com GPU/driver problematico (ex.: Rockchip/Allwinner
+        // antigos): sem isso a WebView pode desenhar so uma tela branca vazia.
+        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
         setContentView(webView)
 
         val settings: WebSettings = webView.settings
